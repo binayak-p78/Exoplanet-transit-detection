@@ -12,7 +12,7 @@
 
 ##  Overview
 
-This project applies a **1D Convolutional Neural Network (CNN)** to automatically detect exoplanets from NASA's Kepler Space Telescope photometric data. By analyzing the brightness (flux) of stars over time — called a **light curve** — the model learns to identify the subtle, periodic dips in starlight caused by a planet passing in front of its host star.
+This project applies a **1D Convolutional Neural Network (CNN)** to automatically detect exoplanets from NASA's Kepler Space Telescope photometric data. By analyzing the brightness (flux) of stars over time, called a **light curve**,  the model learns to identify the subtle, periodic dips in starlight caused by a planet passing in front of its host star.
 
 The pipeline covers the complete machine learning lifecycle:
 
@@ -43,7 +43,7 @@ These dips are:
 - **Shallow** — typically blocking only 0.01%–1% of stellar flux
 - **Consistent** — identical depth and duration across multiple transits
 
-The core challenge is that these signatures are often buried in stellar noise, instrument artifacts, and long-term variability — making automated detection essential at scale.
+The core challenge is that these signatures are often buried in stellar noise, instrument artifacts, and long-term variability, making automated detection essential at scale.
 
 ### Phase Folding
 
@@ -69,7 +69,7 @@ Each row in the CSV represents a single star. Columns `FLUX.1` through `FLUX.319
 
 ###  The Class Imbalance Problem
 
-Only **37 out of 5,087** training stars host confirmed planets — a ratio of ~136:1. A naive model that predicts "No Planet" for every star achieves 99.3% accuracy while being entirely useless. Addressing this imbalance is the most critical challenge in the entire pipeline.
+Only **37 out of 5,087** training stars host confirmed planets, a ratio of ~136:1. A naive model that predicts "No Planet" for every star achieves 99.3% accuracy while being entirely useless. Addressing this imbalance is the most critical challenge in the entire pipeline.
 
 ---
 
@@ -79,7 +79,7 @@ Only **37 out of 5,087** training stars host confirmed planets — a ratio of ~1
 Original labels (1 = No Planet, 2 = Planet) were remapped to binary format (0 / 1) for compatibility with sigmoid output.
 
 ### 2. Row-wise Standardization
-Each star's 3,197-point flux sequence was independently standardized using `StandardScaler` applied **per row** (not per column). This removes differences in absolute brightness between stars, centering each light curve at zero with unit variance — critical for stable neural network training.
+Each star's 3,197-point flux sequence was independently standardized using `StandardScaler` applied **per row** (not per column). This removes differences in absolute brightness between stars, centering each light curve at zero with unit variance, critical for stable neural network training.
 
 ```python
 scaler = StandardScaler()
@@ -106,7 +106,7 @@ To force the model to prioritize rare planet detections, balanced class weights 
 
 ##  Model Architecture — 1D Convolutional Neural Network
 
-A **1D-CNN** was chosen because it naturally encodes the inductive bias that transit events are **local, translatable patterns in time** — a sliding filter can detect a dip regardless of where it appears in the sequence. This is fundamentally different from Dense networks, which treat every time step independently.
+A **1D-CNN** was chosen because it naturally encodes the inductive bias that transit events are **local, translatable patterns in time**, and a sliding filter can detect a dip regardless of where it appears in the sequence. This is fundamentally different from Dense networks, which treat every time step independently.
 
 ```
 Input: (batch, 3197, 1)
@@ -199,10 +199,10 @@ Actual: Planet            3  FN              2  TP
 
 However, because the dataset is so imbalanced, accuracy alone is misleading. The more meaningful metrics are per-class:
 
-- **No Planet class** — Near-perfect (99% precision, 99% recall). The model reliably filters out non-planet stars.
-- **Planet class** — 40% recall means the model successfully identifies 2 of the 5 confirmed planet stars in the test set. The 29% precision means some false positives are generated.
+- **No Planet class** - Near-perfect (99% precision, 99% recall). The model reliably filters out non-planet stars.
+- **Planet class** 40% recall means the model successfully identifies 2 of the 5 confirmed planet stars in the test set. The 29% precision means some false positives are generated.
 
-The low planet-class metrics are expected given only **5 test examples** exist — this makes statistical conclusions fragile. The weighted loss ensures the model at least attempts to find planets rather than ignoring them entirely.
+The low planet-class metrics are expected, given only **5 test examples** exist — this makes statistical conclusions fragile. The weighted loss ensures the model at least attempts to find planets rather than ignoring them entirely.
 
 ---
 
@@ -271,11 +271,11 @@ jupyter notebook Identifying_Exoplanetary_Transits.ipynb
 
 ##  Key Takeaways
 
-- **Domain-driven preprocessing matters** — row-wise (per-star) normalization was the scientifically correct choice, not column-wise
-- **Class imbalance requires deliberate intervention** — weighted loss penalizing missed planets 68× was essential for the model to be useful at all
-- **Architecture should match data structure** — 1D-CNNs encode the right inductive bias for local temporal patterns in time-series data
-- **Accuracy alone is misleading** — with a 99:1 class ratio, per-class precision and recall tell the real story
-- **Regularization is non-negotiable with tiny positive class sizes** — Dropout(0.5) + BatchNorm help generalize from just 37 planet examples
+- **Domain-driven preprocessing matters** - row-wise (per-star) normalization was the scientifically correct choice, not column-wise
+- **Class imbalance requires deliberate intervention**- weighted loss penalizing missed planets 68× was essential for the model to be useful at all
+- **Architecture should match data structure** - 1D-CNNs encode the right inductive bias for local temporal patterns in time-series data
+- **Accuracy alone is misleading** - with a 99:1 class ratio, per-class precision and recall tell the real story
+- **Regularization is non-negotiable with tiny positive class sizes** - Dropout(0.5) + BatchNorm help generalize from just 37 planet examples
 
 ---
 

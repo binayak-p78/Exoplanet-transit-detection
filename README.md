@@ -73,7 +73,7 @@ Only **37 out of 5,087** training stars host confirmed planets — a ratio of ~1
 
 ---
 
-## 🔧 Methodology
+##  Methodology
 
 ### 1. Label Encoding
 Original labels (1 = No Planet, 2 = Planet) were remapped to binary format (0 / 1) for compatibility with sigmoid output.
